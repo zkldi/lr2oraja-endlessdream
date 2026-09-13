@@ -21,6 +21,17 @@ repositories {
         dirs("../lib")
     }
     maven(url = "https://jitpack.io")
+
+    val backbeatSdkCommit = providers.gradleProperty("backbeatSdkCommit")
+    if (backbeatSdkCommit.isPresent) {
+        ivy {
+            url = uri("https://github.com/zkldi/backbeat/releases/download/c-sdk-${backbeatSdkCommit.get()}")
+            patternLayout {
+                artifact("[artifact]-[revision](-[classifier]).[ext]")
+            }
+            metadataSources { artifact() }
+        }
+    }
 }
 
 version = libs.versions.beatoraja.get()
@@ -141,6 +152,22 @@ dependencies {
     implementation(libs.bundles.jackson)
 
     implementation(libs.bundles.jna)
+
+    val localBackbeatSdk = providers.gradleProperty("backbeatSdkLocalPath")
+    if (localBackbeatSdk.isPresent) {
+        implementation(files(localBackbeatSdk.get()))
+        providers.gradleProperty("backbeatSdkNativeLocalPath").orNull?.let {
+            runtimeOnly(files(it))
+        }
+    } else {
+        val backbeatSdkCommit = providers.gradleProperty("backbeatSdkCommit")
+        if (backbeatSdkCommit.isPresent) {
+            val platform = System.getProperty("platform") ?: "windows"
+            val arch = System.getProperty("arch") ?: "x86-64"
+            implementation("ac.backbeat:backbeat-java-sdk:0.1.0")
+            runtimeOnly("ac.backbeat:backbeat-java-sdk:0.1.0:$platform-$arch")
+        }
+    }
 
     implementation(libs.sqlite)
     implementation(libs.commons.compress)
