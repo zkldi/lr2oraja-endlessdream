@@ -11,12 +11,12 @@ alias u := update
 is_it_arm := if arch() == "aarch64" { arch() + "-" } else { "" }
 
 default_arch := if os() == "macos" { if arch() == "aarch64" { "macos-arm" } else { os() } } else { os() }
-default_slug := "lr2oraja-0.8.8-endlessdream-" + os() + "-" + is_it_arm + "pre0.3.1.jar"
+default_slug := "lr2oraja-0.8.8-endlessdream-bkb-" + os() + "-" + is_it_arm + "pre0.4.1.jar"
 
 # Build the project. Takes "windows", "linux", "macos", and "macos-arm" as arguments. Built JARs are placed in dist/
 build arch=default_arch:
   ./gradlew core:shadowJar {{ if arch == "macos-arm" { "-Dplatform=macos -Darch=aarch64" } else { "-Dplatform=" + arch } }}  
-  @echo "Justfile: Built JAR for " + arch + " successfully"
+  @echo "Justfile: Built JAR for {{arch}} successfully"
 
 # Build the project for all architectures
 build_all: (build "windows") (build "linux") (build "macos") (build "macos-arm")
@@ -42,4 +42,3 @@ nuke:
   rm -rf ./core/build/
   rm -rf ./dist/
   gradle clean
-
