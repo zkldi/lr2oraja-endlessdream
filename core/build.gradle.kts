@@ -9,7 +9,7 @@ plugins {
     id("org.endlessdream.extra.multiplatform-convention")
 }
 
-val backbeatSdkVersion = "1.0.0"
+val backbeatSdkVersion = "1.0.1"
 val backbeatReleaseUrl = "https://github.com/zkldi/backbeat/releases/download/v$backbeatSdkVersion"
 
 java {
@@ -126,11 +126,11 @@ tasks.register("generateBuildMetaInfo") {
 
 val backbeatClassifier = "${System.getProperty("platform") ?: "windows"}-${System.getProperty("arch") ?: "x86-64"}"
 val backbeatNativeSha256 = mapOf(
-    "windows-x86-64" to "bde08c0f68ebdf551f32653987d63e1266453b5f756a39f27eb9353db71d37e1",
-    "macos-x86-64" to "7c32663530c472e416c1937dc904596802e7324b7c7e27d1d962e7249b5677c1",
-    "macos-aarch64" to "cc7297a59330945b41dbeed1dd35189459b906ffbe45afa95b814ad213b6aa9b",
-    "linux-x86-64" to "a5822e3c2ab65f2c41553ed921df20384a9dde3c04746dd5ca67a7843f648cdb",
-    "linux-aarch64" to "d2184a4cec795e6db36eb9cdf9537a91c349c1ecea02b6fbced31a328a0dbb7f",
+    "windows-x86-64" to "619d6c9dbf7f2c05e76fb78500a7001e950306892bfd6ff94551a27d506b4dd7",
+    "macos-x86-64" to "8a0a0ab44b1099a49f1439a36bde6870517c7340a80e918fecbaa94f0d3ec890",
+    "macos-aarch64" to "d4561e6d7f752928e2b50bc0b5e3e2a6674bf2db2369c56f4171d6c8ff3f9dc8",
+    "linux-x86-64" to "3b8fd6b597726ab040936b28bc4c6690a08ed04475915b92226540d215cc28f2",
+    "linux-aarch64" to "50f925e3a52a0f799b74296396980088ba458dea798319d1cfc61b8c1a3bf8d3",
 )[backbeatClassifier] ?: throw GradleException("Backbeat SDK $backbeatSdkVersion does not support $backbeatClassifier")
 
 // versions and bundles defined in ../gradle/libs.versions.toml
@@ -196,7 +196,7 @@ dependencies {
     testRuntimeOnly(libs.junit.platform.launcher)
 }
 
-val backbeatJavaSha256 = "cc7dd59ce53f9107974726ace5e6dce4d3f054cd0d2fbcae2be89d662119a113"
+val backbeatJavaSha256 = "96cebe81c21f6aa0c6ef6c382035185625f1b0de0ebde7f4f7c23538eb0679fc"
 
 val verifyBackbeatSdk by tasks.registering {
     val expected = mapOf(
