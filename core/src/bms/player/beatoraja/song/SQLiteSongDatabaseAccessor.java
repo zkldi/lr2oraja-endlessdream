@@ -49,6 +49,7 @@ public class SQLiteSongDatabaseAccessor extends SQLiteDatabaseAccessor implement
 	private final ResultSetHandler<List<FolderData>> folderhandler = new BeanListHandler<FolderData>(FolderData.class);
 
 	private final QueryRunner qr;
+	
 	private List<SongDatabaseAccessorPlugin> plugins = new ArrayList();
 	/**
 	 * Used in updateSongDatas and it's variants. This design is based on an assumption that we cannot delete an
@@ -158,8 +159,7 @@ public class SQLiteSongDatabaseAccessor extends SQLiteDatabaseAccessor implement
 	 */
 	public SongData[] getSongDatas(String key, String value) {
 		try {
-			final List<SongData> m = qr.query("SELECT * FROM song WHERE " + key + " = ?",
-					songhandler, value);
+			final List<SongData> m = qr.query("SELECT * FROM song WHERE " + key + " = ?", songhandler, value);
 			return Validatable.removeInvalidElements(m).toArray(new SongData[0]);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -192,8 +192,8 @@ public class SQLiteSongDatabaseAccessor extends SQLiteDatabaseAccessor implement
 					md5str.append('\'').append(hash).append('\'');
 				}
 			}
-			List<SongData> m = qr.query("SELECT * FROM song WHERE md5 IN (" + md5str + ") OR sha256 IN ("
-					+ sha256str + ")", songhandler);
+			List<SongData> m = qr.query("SELECT * FROM song WHERE md5 IN (" + md5str.toString() + ") OR sha256 IN ("
+					+ sha256str.toString() + ")", songhandler);
 			
 			// 検索並び順保持
 			List<SongData> sorted = m.stream().sorted((a, b) -> {
@@ -231,7 +231,7 @@ public class SQLiteSongDatabaseAccessor extends SQLiteDatabaseAccessor implement
                     String s = "SELECT DISTINCT md5, song.sha256 AS sha256, title, subtitle, genre, artist, subartist,path,folder,stagefile,banner,backbmp,parent,level,difficulty,"
                             + "maxbpm,minbpm,song.mode AS mode, judge, feature, content, song.date AS date, favorite, song.notes AS notes, adddate, preview, length, charthash,backbeatBundleId,backbeatFilename"
                             + " FROM song INNER JOIN (information LEFT OUTER JOIN (score LEFT OUTER JOIN scorelog ON score.sha256 = scorelog.sha256) ON information.sha256 = score.sha256) "
-							+ "ON song.sha256 = information.sha256 WHERE " + sql;
+                            + "ON song.sha256 = information.sha256 WHERE " + sql;
                     ResultSet rs = stmt.executeQuery(s);
                     m = songhandler.handle(rs);
     				// System.out.println(s + " -> result : " + m.size());
@@ -239,7 +239,7 @@ public class SQLiteSongDatabaseAccessor extends SQLiteDatabaseAccessor implement
                 } else {
                     String s = "SELECT DISTINCT md5, song.sha256 AS sha256, title, subtitle, genre, artist, subartist,path,folder,stagefile,banner,backbmp,parent,level,difficulty,"
                             + "maxbpm,minbpm,song.mode AS mode, judge, feature, content, song.date AS date, favorite, song.notes AS notes, adddate, preview, length, charthash,backbeatBundleId,backbeatFilename"
-							+ " FROM song LEFT OUTER JOIN (score LEFT OUTER JOIN scorelog ON score.sha256 = score.sha256) ON song.sha256 = score.sha256 WHERE " + sql;
+                            + " FROM song LEFT OUTER JOIN (score LEFT OUTER JOIN scorelog ON score.sha256 = scorelog.sha256) ON song.sha256 = score.sha256 WHERE " + sql;
                     ResultSet rs = stmt.executeQuery(s);
                     m = songhandler.handle(rs);
                 }
@@ -260,8 +260,8 @@ public class SQLiteSongDatabaseAccessor extends SQLiteDatabaseAccessor implement
 	public SongData[] getSongDatasByText(String text) {
 		try {
 			List<SongData> m = qr.query(
-					"SELECT * FROM song WHERE rtrim(title||' '||subtitle||' '||artist||' '||subartist||' '||genre) LIKE ? GROUP BY sha256",
-					songhandler, "%" + text + "%");
+					"SELECT * FROM song WHERE rtrim(title||' '||subtitle||' '||artist||' '||subartist||' '||genre) LIKE ?"
+							+ " GROUP BY sha256",songhandler, "%" + text + "%");
 			return Validatable.removeInvalidElements(m).toArray(new SongData[0]);
 		} catch (Exception e) {
 			logger.error("song.db更新時の例外:{}", e.getMessage());
@@ -340,7 +340,6 @@ public class SQLiteSongDatabaseAccessor extends SQLiteDatabaseAccessor implement
 				SELECT
 					bundle.id,
 					bundle.filename,
-					bundle.chart_sha256,
 					chart_data.gzip_data,
 					(
 					SELECT
@@ -374,7 +373,7 @@ public class SQLiteSongDatabaseAccessor extends SQLiteDatabaseAccessor implement
 					bundle.chart_sha256, bundle.id
 				""";
 
-				int updated = 0;
+		int updated = 0;
 		try (Statement statement = conn.createStatement(); ResultSet result = statement.executeQuery(query)) {
 			while (result.next()) {
 				byte[] chartData;
@@ -385,7 +384,6 @@ public class SQLiteSongDatabaseAccessor extends SQLiteDatabaseAccessor implement
 
 				String bundleId = result.getString("id");
 				String filename = result.getString("filename");
-				String sha256 = result.getString("chart_sha256");
 				String preview = result.getString("preview");
 				ChartDecoder decoder = ChartDecoder.getDecoder(Path.of(filename));
 				BMSModel model = null;
@@ -402,7 +400,7 @@ public class SQLiteSongDatabaseAccessor extends SQLiteDatabaseAccessor implement
 					qr.update(conn, "DELETE FROM song WHERE backbeatBundleId = ?", bundleId);
 					continue;
 				}
-	
+
 				SongData song = new SongData(model, false);
 				if ((song.getPreview() == null || song.getPreview().isBlank()) && preview != null) {
 					song.setPreview(preview);

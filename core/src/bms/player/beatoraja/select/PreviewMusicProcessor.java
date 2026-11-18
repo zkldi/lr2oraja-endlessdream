@@ -115,8 +115,8 @@ public class PreviewMusicProcessor {
         private void stopPreview(boolean pause) {
             if(playing != null && !playing.key.isEmpty()) {
                 if(playing.resource != null) {
-					audio.stop(playing.resource);
-					audio.dispose(playing.resource);
+                    audio.stop(playing.resource);
+                    audio.dispose(playing.resource);
                 } else if(pause) {
                 	for(int i = 10;i >= 0;i--) {
                 		float vol = i * 0.1f * config.getAudioConfig().getSystemvolume();

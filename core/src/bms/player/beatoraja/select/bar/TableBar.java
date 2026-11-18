@@ -55,9 +55,9 @@ public class TableBar extends DirectoryBar {
     	return tr;
     }
 
-	public boolean isBackbeat() {
-		return tr instanceof BackbeatTableAdapter;
-	}
+    public boolean isBackbeat() {
+        return tr instanceof BackbeatTableAdapter;
+    }
 
     public void setTableData(TableData td) {
     	this.td = td;

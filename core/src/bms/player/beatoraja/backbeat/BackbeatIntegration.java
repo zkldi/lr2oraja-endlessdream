@@ -107,17 +107,6 @@ public final class BackbeatIntegration implements AutoCloseable {
         return new CatalogTable(url, table.name(), table.symbol(), table.gamemode(), sections);
     }
 
-    public record CatalogChart(String bundleId, String filename, String sha256, String preview, byte[] data) {
-        public CatalogChart {
-            data = data.clone();
-        }
-
-        @Override
-        public byte[] data() {
-            return data.clone();
-        }
-    }
-
     public record CatalogTable(String url, String name, String symbol, String gamemode,
                                List<CatalogTableSection> sections) {
         public CatalogTable { sections = List.copyOf(sections); }

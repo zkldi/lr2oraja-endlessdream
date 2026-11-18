@@ -197,7 +197,7 @@ public abstract class AbstractAudioDriver<T> implements AudioDriver {
 				sound = sound.audio != null ? sound : null;
 				soundmap.put(p, sound);
 			} catch (Exception e) {
-				logger.warn("Failed to load audio: {}", e.getMessage());
+				logger.warn("音源読み込み失敗。{}", e.getMessage());
 			}
 		}		
 		return sound;
@@ -658,11 +658,11 @@ public abstract class AbstractAudioDriver<T> implements AudioDriver {
 		private T loadSlice(AudioKey key) {
             PCM wav = null;
             synchronized(pcmMap) {
-				wav = pcmMap.get(key.key);
+                wav = pcmMap.get(key.key);
                 if (wav == null) {
-					wav = PCM.load(key.resource, AbstractAudioDriver.this);
+                    wav = PCM.load(key.resource, AbstractAudioDriver.this);
                     if(wav != null) {
-						pcmMap.put(key.key, wav);
+                        pcmMap.put(key.key, wav);
                     }
                 }
             }
@@ -689,7 +689,7 @@ public abstract class AbstractAudioDriver<T> implements AudioDriver {
 			logger.trace("音源ファイルを読み込む中：{}", key.key);
 
 		    T sound = key.start == 0 && key.duration == 0
-					? getKeySound(key.resource) // 音切りなしのケース
+                    ? getKeySound(key.resource) // 音切りなしのケース
                     : loadSlice(key);
 
 		    if (sound == null) {

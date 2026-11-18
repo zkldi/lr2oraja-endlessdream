@@ -147,8 +147,7 @@ public class EventFactory {
 			if (!Desktop.isDesktopSupported()) {
 				return;
 			}
-			if(state instanceof MusicSelector selector && selector.getBarManager().getSelected() instanceof SongBar songbar
-					&& songbar.existsSong()) {
+			if(state instanceof MusicSelector selector && selector.getBarManager().getSelected() instanceof SongBar songbar && songbar.existsSong()) {
 				Path directory = songbar.getSongData().getFilesystemPath().map(Path::getParent).orElse(null);
 				if(directory == null) return;
 				try (Stream<Path> paths = Files.list(directory)) {
